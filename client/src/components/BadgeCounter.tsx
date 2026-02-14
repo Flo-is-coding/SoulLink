@@ -7,25 +7,8 @@ interface Props {
   onUpdateBadges: (badges: number) => void;
 }
 
-// 8 distinctive clip-path shapes for badges
-const BADGE_SHAPES: string[] = [
-  // 1: Octagon
-  "polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%)",
-  // 2: Water drop / teardrop
-  "polygon(50% 0%, 85% 35%, 100% 65%, 85% 85%, 65% 100%, 35% 100%, 15% 85%, 0% 65%, 15% 35%)",
-  // 3: Lightning / angular
-  "polygon(40% 0%, 80% 0%, 55% 40%, 90% 40%, 30% 100%, 45% 55%, 10% 55%)",
-  // 4: Star / flower
-  "polygon(50% 0%, 63% 30%, 98% 35%, 72% 57%, 79% 91%, 50% 73%, 21% 91%, 28% 57%, 2% 35%, 37% 30%)",
-  // 5: Heart / shield
-  "polygon(50% 15%, 70% 0%, 95% 0%, 100% 25%, 100% 50%, 50% 100%, 0% 50%, 0% 25%, 5% 0%, 30% 0%)",
-  // 6: Hexagon
-  "polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%)",
-  // 7: Flame / pentagon-up
-  "polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%)",
-  // 8: Diamond
-  "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)",
-];
+const BADGE_SPRITE_URL =
+  "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/badges/";
 
 export default function BadgeCounter({
   generation,
@@ -49,55 +32,46 @@ export default function BadgeCounter({
       <span className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold shrink-0">
         {earnedCount}/{gen.badges.length}
       </span>
-      <div className="flex gap-2">
+      <div className="flex gap-1.5">
         {gen.badges.map((badge, i) => {
           const earned = !!(badges & (1 << i));
           const typeColor = TYPE_COLORS[badge.type] || "#888";
-          const shape = BADGE_SHAPES[i % BADGE_SHAPES.length];
 
           return (
             <button
               key={i}
               onClick={() => toggleBadge(i)}
               title={`${badge.name} Badge (${badge.type}) — Lv ${badge.levelCap}`}
-              className="group relative flex flex-col items-center gap-0.5"
+              className="group relative"
             >
-              {/* Badge shape */}
-              <div
-                className={`w-8 h-8 transition-all ${
-                  earned
-                    ? "scale-100 drop-shadow-[0_0_6px_var(--glow)]"
-                    : "scale-90 opacity-30 grayscale hover:opacity-50 hover:grayscale-0"
-                }`}
-                style={{
-                  "--glow": typeColor + "80",
-                } as React.CSSProperties}
-              >
+              {badge.spriteId ? (
+                <img
+                  src={`${BADGE_SPRITE_URL}${badge.spriteId}.png`}
+                  alt={`${badge.name} Badge`}
+                  className={`w-9 h-9 object-contain transition-all ${
+                    earned
+                      ? "drop-shadow-[0_0_6px_var(--glow)]"
+                      : "grayscale opacity-25 hover:opacity-40 hover:grayscale-[50%]"
+                  }`}
+                  style={{
+                    "--glow": typeColor + "80",
+                  } as React.CSSProperties}
+                />
+              ) : (
                 <div
-                  className="w-full h-full relative"
-                  style={{ clipPath: shape }}
-                >
-                  {/* Gradient fill */}
-                  <div
-                    className="absolute inset-0"
-                    style={{
-                      background: earned
-                        ? `linear-gradient(135deg, ${typeColor} 0%, ${typeColor}cc 50%, ${typeColor}88 100%)`
-                        : `linear-gradient(135deg, #475569 0%, #334155 100%)`,
-                    }}
-                  />
-                  {/* Shine overlay */}
-                  {earned && (
-                    <div
-                      className="absolute inset-0"
-                      style={{
-                        background:
-                          "linear-gradient(135deg, rgba(255,255,255,0.35) 0%, transparent 50%, rgba(0,0,0,0.15) 100%)",
-                      }}
-                    />
-                  )}
-                </div>
-              </div>
+                  className={`w-8 h-8 rounded-full transition-all ${
+                    earned
+                      ? "drop-shadow-[0_0_6px_var(--glow)]"
+                      : "opacity-25 grayscale hover:opacity-40"
+                  }`}
+                  style={{
+                    "--glow": typeColor + "80",
+                    background: earned
+                      ? `linear-gradient(135deg, ${typeColor}, ${typeColor}88)`
+                      : "#475569",
+                  } as React.CSSProperties}
+                />
+              )}
             </button>
           );
         })}
