@@ -17,46 +17,46 @@ import {
   type FailedEncounterInput,
 } from "../repositories/sessionRepository";
 
-function broadcastState(io: Server, sessionId: string) {
-  const session = getSession(sessionId);
+async function broadcastState(io: Server, sessionId: string) {
+  const session = await getSession(sessionId);
   io.to(sessionId).emit("session:state", session);
 }
 
 export function registerSessionHandler(io: Server, socket: Socket) {
-  socket.on("session:join", (sessionId: string) => {
+  socket.on("session:join", async (sessionId: string) => {
     socket.join(sessionId);
-    const session = getSession(sessionId);
+    const session = await getSession(sessionId);
     if (session) {
       socket.emit("session:state", session);
     }
   });
 
-  socket.on("player:add", (data: { sessionId: string; name: string }) => {
+  socket.on("player:add", async (data: { sessionId: string; name: string }) => {
     try {
-      addPlayer(data.sessionId, data.name);
-      broadcastState(io, data.sessionId);
+      await addPlayer(data.sessionId, data.name);
+      await broadcastState(io, data.sessionId);
     } catch (err: any) {
       socket.emit("error", { message: err.message });
     }
   });
 
-  socket.on("player:remove", (data: { sessionId: string; playerId: string }) => {
-    removePlayer(data.playerId);
-    broadcastState(io, data.sessionId);
+  socket.on("player:remove", async (data: { sessionId: string; playerId: string }) => {
+    await removePlayer(data.playerId);
+    await broadcastState(io, data.sessionId);
   });
 
   // ── Box Events ──
 
   socket.on(
     "box:add",
-    (data: {
+    async (data: {
       sessionId: string;
       entries: AddToBoxInput[];
       route: string | null;
     }) => {
       try {
-        addToBox(data.sessionId, data.entries, data.route);
-        broadcastState(io, data.sessionId);
+        await addToBox(data.sessionId, data.entries, data.route);
+        await broadcastState(io, data.sessionId);
       } catch (err: any) {
         socket.emit("error", { message: err.message });
       }
@@ -65,22 +65,22 @@ export function registerSessionHandler(io: Server, socket: Socket) {
 
   socket.on(
     "box:update",
-    (data: {
+    async (data: {
       sessionId: string;
       entryId: string;
       nickname: string | null;
       route: string | null;
     }) => {
-      updateBoxEntry(data.entryId, data.nickname, data.route);
-      broadcastState(io, data.sessionId);
+      await updateBoxEntry(data.entryId, data.nickname, data.route);
+      await broadcastState(io, data.sessionId);
     }
   );
 
   socket.on(
     "box:kill-link",
-    (data: { sessionId: string; linkGroup: string }) => {
-      killLinkGroup(data.linkGroup);
-      broadcastState(io, data.sessionId);
+    async (data: { sessionId: string; linkGroup: string }) => {
+      await killLinkGroup(data.linkGroup);
+      await broadcastState(io, data.sessionId);
     }
   );
 
@@ -88,31 +88,31 @@ export function registerSessionHandler(io: Server, socket: Socket) {
 
   socket.on(
     "slot:assign",
-    (data: { sessionId: string; slotId: string; boxEntryId: string }) => {
+    async (data: { sessionId: string; slotId: string; boxEntryId: string }) => {
       try {
-        assignToSlot(data.slotId, data.boxEntryId);
-        broadcastState(io, data.sessionId);
+        await assignToSlot(data.slotId, data.boxEntryId);
+        await broadcastState(io, data.sessionId);
       } catch (err: any) {
         socket.emit("error", { message: err.message });
       }
     }
   );
 
-  socket.on("slot:clear", (data: { sessionId: string; slotId: string }) => {
-    clearSlot(data.slotId);
-    broadcastState(io, data.sessionId);
+  socket.on("slot:clear", async (data: { sessionId: string; slotId: string }) => {
+    await clearSlot(data.slotId);
+    await broadcastState(io, data.sessionId);
   });
 
-  socket.on("slot:clear-all", (data: { sessionId: string }) => {
-    clearAllSlots(data.sessionId);
-    broadcastState(io, data.sessionId);
+  socket.on("slot:clear-all", async (data: { sessionId: string }) => {
+    await clearAllSlots(data.sessionId);
+    await broadcastState(io, data.sessionId);
   });
 
   socket.on(
     "slot:swap",
-    (data: { sessionId: string; slotIdA: string; slotIdB: string }) => {
-      swapSlots(data.slotIdA, data.slotIdB);
-      broadcastState(io, data.sessionId);
+    async (data: { sessionId: string; slotIdA: string; slotIdB: string }) => {
+      await swapSlots(data.slotIdA, data.slotIdB);
+      await broadcastState(io, data.sessionId);
     }
   );
 
@@ -120,9 +120,9 @@ export function registerSessionHandler(io: Server, socket: Socket) {
 
   socket.on(
     "session:update-badges",
-    (data: { sessionId: string; badges: number }) => {
-      updateBadges(data.sessionId, data.badges);
-      broadcastState(io, data.sessionId);
+    async (data: { sessionId: string; badges: number }) => {
+      await updateBadges(data.sessionId, data.badges);
+      await broadcastState(io, data.sessionId);
     }
   );
 
@@ -130,17 +130,17 @@ export function registerSessionHandler(io: Server, socket: Socket) {
 
   socket.on(
     "encounter:failed",
-    (data: { sessionId: string; route: string; pokemon: FailedEncounterInput[] }) => {
-      addFailedEncounter(data.sessionId, data.route, data.pokemon);
-      broadcastState(io, data.sessionId);
+    async (data: { sessionId: string; route: string; pokemon: FailedEncounterInput[] }) => {
+      await addFailedEncounter(data.sessionId, data.route, data.pokemon);
+      await broadcastState(io, data.sessionId);
     }
   );
 
   socket.on(
     "encounter:remove-failed",
-    (data: { sessionId: string; encounterId: string }) => {
-      removeFailedEncounter(data.encounterId);
-      broadcastState(io, data.sessionId);
+    async (data: { sessionId: string; encounterId: string }) => {
+      await removeFailedEncounter(data.encounterId);
+      await broadcastState(io, data.sessionId);
     }
   );
 }

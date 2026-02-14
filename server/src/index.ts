@@ -2,6 +2,7 @@ import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import cors from "cors";
+import { initDb } from "./db";
 import sessionRoutes from "./routes/sessions";
 import { registerSessionHandler } from "./socket/sessionHandler";
 
@@ -30,8 +31,17 @@ io.on("connection", (socket) => {
 });
 
 const PORT = Number(process.env.PORT) || 3001;
-httpServer.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+
+async function start() {
+  await initDb();
+  httpServer.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+  });
+}
+
+start().catch((err) => {
+  console.error("Failed to start server:", err);
+  process.exit(1);
 });
 
 export { io };
