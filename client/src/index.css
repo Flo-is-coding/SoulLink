@@ -1,0 +1,71 @@
+@import "tailwindcss";
+
+@theme {
+  --color-surface-900: #252840;
+  --color-surface-800: #2f3255;
+  --color-surface-700: #3b3e6a;
+  --color-surface-600: #4b4f80;
+  --color-surface-500: #5f6396;
+  --color-surface-400: #7b7fb5;
+
+  --color-link-1: #ef4444;
+  --color-link-2: #f97316;
+  --color-link-3: #eab308;
+  --color-link-4: #22c55e;
+  --color-link-5: #3b82f6;
+  --color-link-6: #a855f7;
+}
+
+body {
+  margin: 0;
+  background: linear-gradient(145deg, #252840 0%, #222544 40%, #2e2542 100%);
+  background-attachment: fixed;
+  color: #e2e8f0;
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+}
+
+/* Subtle ambient glow background */
+.pokeball-bg {
+  background-image:
+    radial-gradient(ellipse at 15% 85%, rgba(239, 68, 68, 0.05) 0%, transparent 50%),
+    radial-gradient(ellipse at 85% 15%, rgba(96, 165, 250, 0.05) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(168, 85, 247, 0.03) 0%, transparent 60%);
+}
+
+/* Card glass effect */
+.card-glass {
+  background: linear-gradient(
+    135deg,
+    rgba(50, 52, 90, 0.8) 0%,
+    rgba(40, 42, 72, 0.6) 100%
+  );
+  backdrop-filter: blur(8px);
+  box-shadow:
+    0 2px 12px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.card-glass:hover {
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-surface-500);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-surface-400);
+}
